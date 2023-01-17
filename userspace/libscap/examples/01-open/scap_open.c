@@ -41,6 +41,7 @@ limitations under the License.
 #define SIMPLE_SET_OPTION "--simple_set"
 #define CPUS_FOR_EACH_BUFFER_MODE "--cpus_for_buf"
 #define ALL_AVAILABLE_CPUS_MODE "--available_cpus"
+#define DROP_FAILED "--drop-failed"
 
 /* PRINT */
 #define VALIDATION_OPTION "--validate_syscalls"
@@ -64,6 +65,7 @@ static int evt_type = -1;		  /* event type to print. */
 static bool ppm_sc_is_set = 0;
 static bool tp_is_set = 0;
 static unsigned long buffer_bytes_dim = DEFAULT_DRIVER_BUFFER_BYTES_DIM;
+static bool drop_failed = false;
 
 static int simple_set[] = {
 	PPM_SC_ACCEPT,
@@ -714,6 +716,7 @@ void print_help()
 	printf("[MODERN PROBE ONLY, EXPERIMENTAL]\n");
 	printf("'%s <cpus_for_each_buffer>': allocate a ring buffer for every `cpus_for_each_buffer` CPUs.\n", CPUS_FOR_EACH_BUFFER_MODE);
 	printf("'%s': allocate ring buffers for all available CPUs. Default: allocate ring buffers for online CPUs only.\n", ALL_AVAILABLE_CPUS_MODE);
+	printf("'%s': instrument drivers to drop failed syscalls (exit) events.\n", DROP_FAILED);
 	printf("\n------> VALIDATION OPTIONS\n");
 	printf("'%s': validation checks.\n", VALIDATION_OPTION);
 	printf("\n------> PRINT OPTIONS\n");
@@ -912,6 +915,11 @@ void parse_CLI_options(int argc, char** argv)
 			modern_bpf_params.allocate_online_only = false;
 		}
 
+		if(!strcmp(argv[i], DROP_FAILED))
+		{
+			drop_failed = true;
+		}
+
 
 		/*=============================== CONFIGURATIONS ===========================*/
 
@@ -1040,6 +1048,11 @@ int main(int argc, char** argv)
 	gettimeofday(&tval_start, NULL);
 
 	scap_start_capture(g_h);
+
+	if (drop_failed)
+	{
+		scap_set_dropfailed(g_h, true);
+	}
 
 	while(g_nevts != num_events)
 	{
