@@ -809,6 +809,15 @@ int32_t scap_set_ppm_sc(scap_t* handle, uint32_t ppm_sc, bool enabled);
 */
 int32_t scap_set_tp(scap_t* handle, uint32_t tp, bool enabled);
 
+/*!
+  \brief (Un)Set the drop failed feature of the drivers.
+  When enabled, drivers will stop sending failed syscalls (exit) events.
+
+  \param handle Handle to the capture instance.
+  \param enabled whether to enable or disable the feature
+  \note This function can only be called for live captures.
+*/
+int32_t scap_set_dropfailed(scap_t* handle, bool enabled);
 
 /*!
   \brief Get the root directory of the system. This usually changes

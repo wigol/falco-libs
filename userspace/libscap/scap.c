@@ -1277,6 +1277,16 @@ int32_t scap_set_tp(scap_t* handle, uint32_t tp, bool enabled) {
 	return(scap_handle_tpmask(handle, enabled ? SCAP_TP_MASK_SET : SCAP_TP_MASK_UNSET, tp));
 }
 
+int32_t scap_set_dropfailed(scap_t* handle, bool enabled) {
+	if(handle && handle->m_vtable)
+	{
+		return handle->m_vtable->configure(handle->m_engine, SCAP_DROP_FAILED, enabled, 0);
+	}
+
+	snprintf(handle->m_lasterr,	SCAP_LASTERR_SIZE, "operation not supported");
+	return SCAP_FAILURE;
+}
+
 uint32_t scap_event_get_dump_flags(scap_t* handle)
 {
 	if(handle->m_vtable->savefile_ops)
