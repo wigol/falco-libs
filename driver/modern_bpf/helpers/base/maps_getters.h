@@ -26,6 +26,11 @@ static __always_inline uint32_t maps__get_snaplen()
 	return g_settings.snaplen;
 }
 
+static __always_inline u64 maps__get_drop_failed()
+{
+	return g_settings.drop_failed;
+}
+
 /*=============================== SETTINGS ===========================*/
 
 /*=============================== SYSCALL-64 INTERESTING TABLE ===========================*/

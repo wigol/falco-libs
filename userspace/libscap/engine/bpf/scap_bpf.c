@@ -1366,6 +1366,7 @@ static int32_t set_default_settings(struct bpf_engine *handle)
 	settings.do_dynamic_snaplen = false;
 	settings.dropping_mode = false;
 	settings.is_dropping = false;
+	settings.drop_failed = false;
 	settings.tracers_enabled = false;
 	settings.fullcapture_port_range_start = 0;
 	settings.fullcapture_port_range_end = 0;
@@ -1671,6 +1672,27 @@ static int32_t scap_bpf_handle_tp_mask(struct scap_engine_handle engine, uint32_
 	return load_tracepoints(handle, &new_tp_set);
 }
 
+static int32_t scap_bpf_handle_dropfailed(struct scap_engine_handle engine, bool drop_failed)
+{
+	struct bpf_engine *handle = engine.m_handle;
+	struct scap_bpf_settings settings;
+	int k = 0;
+	int ret;
+
+	if((ret = bpf_map_lookup_elem(handle->m_bpf_map_fds[SCAP_SETTINGS_MAP], &k, &settings)) != 0)
+	{
+		return scap_errprintf(handle->m_lasterr, -ret, "SCAP_SETTINGS_MAP bpf_map_lookup_elem");
+	}
+
+	settings.drop_failed = drop_failed;
+	if((ret = bpf_map_update_elem(handle->m_bpf_map_fds[SCAP_SETTINGS_MAP], &k, &settings, BPF_ANY)) != 0)
+	{
+		return scap_errprintf(handle->m_lasterr, -ret, "SCAP_SETTINGS_MAP bpf_map_update_elem");
+	}
+
+	return SCAP_SUCCESS;
+}
+
 static int32_t scap_bpf_handle_event_mask(struct scap_engine_handle engine, uint32_t op, uint32_t ppm_sc)
 {
 	int32_t ret = SCAP_SUCCESS;
@@ -1713,6 +1735,8 @@ static int32_t configure(struct scap_engine_handle engine, enum scap_setting set
 		return scap_bpf_handle_event_mask(engine, arg1, arg2);
 	case SCAP_TP_MASK:
 		return scap_bpf_handle_tp_mask(engine, arg1, arg2);
+	case SCAP_DROP_FAILED:
+		return scap_bpf_handle_dropfailed(engine, arg1);
 	case SCAP_DYNAMIC_SNAPLEN:
 		if(arg1 == 0)
 		{

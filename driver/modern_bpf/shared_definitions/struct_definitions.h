@@ -25,6 +25,7 @@ struct capture_settings
 {
 	uint64_t boot_time;   /* boot time. */
 	uint32_t snaplen;     /* we use it when we want to read a maximum size from a event and no more. */
+	bool drop_failed;     /* whether to drop failed syscalls (exit events) */
 };
 
 /**

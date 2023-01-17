@@ -155,6 +155,7 @@ static int32_t scap_modern_bpf__configure(struct scap_engine_handle engine, enum
 		return SCAP_SUCCESS;
 	case SCAP_SNAPLEN:
 		pman_set_snaplen(arg1);
+		break;
 	case SCAP_PPM_SC_MASK:
 		/* We use this setting just to modify the interesting syscalls. */
 		if(arg1 == SCAP_PPM_SC_MASK_SET || arg1 == SCAP_PPM_SC_MASK_UNSET)
@@ -164,6 +165,9 @@ static int32_t scap_modern_bpf__configure(struct scap_engine_handle engine, enum
 		return SCAP_SUCCESS;
 	case SCAP_TP_MASK:
 		return pman_update_single_program(arg2, arg1 == SCAP_TP_MASK_SET);
+	case SCAP_DROP_FAILED:
+		pman_set_drop_failed(arg1);
+		return SCAP_SUCCESS;
 	case SCAP_DYNAMIC_SNAPLEN:
 		/* Not supported */
 		return SCAP_SUCCESS;

@@ -89,6 +89,11 @@ enum scap_setting {
 	 * arg2: tp id, see ppm_tp.h
 	 */
 	SCAP_TP_MASK,
+	/**
+	 * @brief tell drivers to drop failed syscalls exit
+	 * arg1: whether to enabled or disable the feature
+	 */
+	SCAP_DROP_FAILED,
 };
 
 struct scap_savefile_vtable {
